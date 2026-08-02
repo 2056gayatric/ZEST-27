@@ -24,4 +24,89 @@
     </div>
   </nav>
 
+  <!-- ===== Hero ===== -->
+  <header class="hero">
+    <div class="hero-dotgrid"></div>
+    <div class="hero-blob"></div>
+    <div class="hero-stripes"></div>
+
+    <svg class="hero-globe" viewBox="0 0 300 300" fill="none" aria-hidden="true">
+      <circle cx="150" cy="150" r="138" stroke="currentColor" stroke-width="1"/>
+      <ellipse cx="150" cy="150" rx="138" ry="42" stroke="currentColor" stroke-width="1"/>
+      <ellipse cx="150" cy="150" rx="138" ry="88" stroke="currentColor" stroke-width="1"/>
+      <ellipse cx="150" cy="150" rx="42" ry="138" stroke="currentColor" stroke-width="1"/>
+      <ellipse cx="150" cy="150" rx="88" ry="138" stroke="currentColor" stroke-width="1"/>
+      <line x1="150" y1="12" x2="150" y2="288" stroke="currentColor" stroke-width="1"/>
+      <circle cx="150" cy="12" r="3" fill="currentColor"/>
+      <circle cx="288" cy="150" r="3" fill="currentColor"/>
+      <circle cx="150" cy="288" r="3" fill="currentColor"/>
+      <circle cx="12" cy="150" r="3" fill="currentColor"/>
+      <circle cx="63" cy="63" r="2.5" fill="currentColor"/>
+      <circle cx="237" cy="237" r="2.5" fill="currentColor"/>
+    </svg>
+
+    <svg class="hero-tower" viewBox="0 0 200 380" fill="none" aria-hidden="true">
+      <rect x="30" y="230" width="140" height="140" stroke="currentColor" stroke-width="1"/>
+      <rect x="70" y="150" width="60" height="220" stroke="currentColor" stroke-width="1"/>
+      <polygon points="70,150 100,95 130,150" stroke="currentColor" stroke-width="1"/>
+      <line x1="100" y1="95" x2="100" y2="45" stroke="currentColor" stroke-width="1"/>
+      <circle cx="100" cy="38" r="6" stroke="currentColor" stroke-width="1"/>
+      <rect x="82" y="185" width="12" height="16" stroke="currentColor" stroke-width="1"/>
+      <rect x="106" y="185" width="12" height="16" stroke="currentColor" stroke-width="1"/>
+      <rect x="82" y="215" width="12" height="16" stroke="currentColor" stroke-width="1"/>
+      <rect x="106" y="215" width="12" height="16" stroke="currentColor" stroke-width="1"/>
+      <rect x="50" y="255" width="14" height="18" stroke="currentColor" stroke-width="1"/>
+      <rect x="80" y="255" width="14" height="18" stroke="currentColor" stroke-width="1"/>
+      <rect x="110" y="255" width="14" height="18" stroke="currentColor" stroke-width="1"/>
+      <rect x="140" y="255" width="14" height="18" stroke="currentColor" stroke-width="1"/>
+      <rect x="50" y="290" width="14" height="18" stroke="currentColor" stroke-width="1"/>
+      <rect x="80" y="290" width="14" height="18" stroke="currentColor" stroke-width="1"/>
+      <rect x="110" y="290" width="14" height="18" stroke="currentColor" stroke-width="1"/>
+      <rect x="140" y="290" width="14" height="18" stroke="currentColor" stroke-width="1"/>
+    </svg>
+
+    <div class="hero-inner">
+      <span class="eyebrow">● Live fest dashboard</span>
+      <h1>ZEST&nbsp;'27</h1>
+      <p class="sub">Fuel new <span class="c-blue">minds</span>, spark bold <span class="c-purple">ideas</span>, and shape <span class="c-blue">the future</span> — track it all live at <span class="c-purple">ZEST'27</span>, where AI agents watch the whole fest to answer your questions and call the next winner.</p>
+
+      <div class="hero-divider">
+        <span class="line"></span>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 0 L14.5 9.5 L24 12 L14.5 14.5 L12 24 L9.5 14.5 L0 12 L9.5 9.5 Z"/></svg>
+        <span class="line"></span>
+      </div>
+
+      <div class="date-badge-wrap">
+        <div class="date-badge">
+          <div class="date-icon-box">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true">
+              <rect x="3" y="5" width="18" height="16" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="16" y1="2" x2="16" y2="6"/>
+              <circle cx="8" cy="14.5" r="1"/><circle cx="12" cy="14.5" r="1"/><circle cx="16" cy="14.5" r="1"/>
+            </svg>
+          </div>
+          <div class="date-sep"></div>
+          <div class="date-value">
+            <span class="date-days" id="date-days">—</span>
+            <span class="date-monthyear" id="date-monthyear"></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="venue-pill">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2C7.6 2 4 5.6 4 10c0 6 8 12 8 12s8-6 8-12c0-4.4-3.6-8-8-8Zm0 11a3 3 0 1 1 0-6 3 3 0 0 1 0 6Z"/></svg>
+        <span id="fest-venue">—</span>
+      </div>
+
+      <div class="hero-stats">
+        <div class="stat-pill"><div class="num" id="stat-matches">0</div><div class="label">Total Matches</div></div>
+        <div class="stat-pill"><div class="num" id="stat-teams">0</div><div class="label">Total Teams</div></div>
+        <div class="stat-pill"><div class="num" id="stat-sports">0</div><div class="label">Sports</div></div>
+      </div>
+      <div class="countdown-block">
+        <span class="hint" style="margin:0 0 8px;">Next marquee match begins in</span>
+        <div class="countdown" id="countdown"></div>
+      </div>
+    </div>
+  </header>
+
   
