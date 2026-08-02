@@ -405,3 +405,58 @@ footer { border-top: 1px solid var(--border); padding: 30px 24px; text-align: ce
 /* Focus visibility */
 button:focus-visible, .tab-btn:focus-visible, input:focus-visible { outline: 2px solid var(--blue-glow); outline-offset: 2px; }
 
+/* ============================================================
+   NEW FEATURES — Live Center, Bracket, Compare, Leaderboard,
+   Medals, Stats, Notifications, Countdown, Badges, Chat chips
+   ============================================================ */
+
+/* ---------- Nav notification bell ---------- */
+.nav-right { position: relative; display: flex; align-items: center; }
+.notif-bell {
+  position: relative; background: var(--card); border: 1px solid var(--border);
+  width: 40px; height: 40px; border-radius: 50%; font-size: 1.05rem;
+  display: flex; align-items: center; justify-content: center;
+}
+.notif-badge {
+  position: absolute; top: -4px; right: -4px; min-width: 18px; height: 18px;
+  border-radius: 999px; background: var(--red-glow, #E4172D); color: #fff;
+  font-family: var(--font-mono); font-size: 0.62rem; font-weight: 700;
+  display: none; align-items: center; justify-content: center; padding: 0 4px;
+}
+.notif-panel {
+  position: absolute; top: 52px; right: 0; width: 320px; max-height: 420px;
+  background: var(--bg-1); border: 1px solid var(--border); border-radius: var(--radius);
+  box-shadow: 0 20px 60px rgba(0,0,0,0.5); display: none; flex-direction: column;
+  overflow: hidden; z-index: 70;
+}
+.notif-panel.open { display: flex; }
+.notif-panel-head { padding: 12px 16px; background: var(--card); border-bottom: 1px solid var(--border); font-family: var(--font-head); font-weight: 700; font-size: 0.85rem; }
+.notif-list { overflow-y: auto; max-height: 360px; }
+.notif-row { display: flex; gap: 10px; padding: 12px 16px; border-bottom: 1px solid var(--border); }
+.notif-row:last-child { border-bottom: none; }
+.notif-icon { font-size: 1.2rem; }
+.notif-title { font-weight: 700; font-size: 0.82rem; }
+.notif-body { color: var(--text-mid); font-size: 0.78rem; margin-top: 2px; }
+.notif-time { color: var(--text-low); font-size: 0.68rem; font-family: var(--font-mono); margin-top: 4px; }
+
+/* ---------- Toasts ---------- */
+.toast-host { position: fixed; top: 80px; right: 24px; z-index: 90; display: flex; flex-direction: column; gap: 10px; }
+.toast {
+  display: flex; gap: 10px; align-items: flex-start; width: 300px;
+  background: var(--bg-1); border: 1px solid var(--blue-glow); border-radius: var(--radius-sm);
+  padding: 12px 14px; box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+  opacity: 0; transform: translateX(30px); transition: all .3s ease;
+}
+.toast.show { opacity: 1; transform: translateX(0); }
+
+/* ---------- Countdown ---------- */
+.countdown-block { margin-top: 30px; display: flex; flex-direction: column; align-items: center; }
+.countdown { display: flex; gap: 14px; }
+.countdown-unit {
+  background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-sm);
+  padding: 12px 16px; text-align: center; min-width: 64px;
+}
+.countdown-unit span { display: block; font-family: var(--font-display); font-size: 1.8rem; color: var(--gold); }
+.countdown-unit label { font-size: 0.65rem; color: var(--text-low); text-transform: uppercase; letter-spacing: 0.05em; }
+.countdown-live { font-family: var(--font-head); color: var(--gold); font-weight: 700; }
+
