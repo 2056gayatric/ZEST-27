@@ -202,3 +202,190 @@ function renderContact() {
 }
 
 /* ---------- AI Insights (10 agents, equally weighted grid) ---------- */
+function renderAIInsights() {
+  const grid = document.getElementById("ai-agents-grid");
+
+  const agents = [
+    {
+      icon: "🎯", title: "Match Predictor", tag: "Agent 01",
+      desc: "Weighs win-rate, NRR/form and standings to call the next match.",
+      action: "Predict next match", id: "predictor"
+    },
+    {
+      icon: "🏅", title: "Form & MVP Tracker", tag: "Agent 02",
+      desc: "Surfaces the standout performer in every sport by impact score.",
+      action: "Show top performers", id: "mvp"
+    },
+    {
+      icon: "📣", title: "Auto-Commentary", tag: "Agent 03",
+      desc: "Turns raw score lines into short, readable highlight blurbs.",
+      action: "Generate live blurb", id: "commentary"
+    },
+    {
+      icon: "⭐", title: "Dream Team Selector", tag: "Agent 04",
+      desc: "Builds an AI XI for the fest from every player's impact score.",
+      action: "Build dream team", id: "dreamteam"
+    },
+    {
+      icon: "⚡", title: "Upset Detector", tag: "Agent 05",
+      desc: "Flags results where a lower-ranked team beat a higher one.",
+      action: "Find upsets", id: "upsets"
+    },
+    {
+      icon: "🔋", title: "Fatigue Advisor", tag: "Agent 06",
+      desc: "Flags teams with a heavy match load who may need rotation.",
+      action: "Check workloads", id: "fatigue"
+    },
+    {
+      icon: "📈", title: "Momentum Tracker", tag: "Agent 07",
+      desc: "Reads each team's last 3 results to call their current trend.",
+      action: "Check momentum", id: "momentum"
+    },
+    {
+      icon: "💰", title: "Sponsor Visibility", tag: "Agent 08",
+      desc: "Estimates each sponsor's remaining on-dashboard exposure.",
+      action: "Analyse sponsors", id: "sponsor"
+    },
+    {
+      icon: "✨", title: "Fun Fact Generator", tag: "Agent 09",
+      desc: "Surfaces a fresh, data-grounded fun fact from the fest.",
+      action: "Give me a fact", id: "funfact"
+    },
+    {
+      icon: "💬", title: "Fest Assistant", tag: "Agent 10",
+      desc: "A chat agent that answers schedule, score and stat questions.",
+      action: "Open chat", id: "chat"
+    }
+  ];
+
+  grid.innerHTML = agents.map(a => `
+    <div class="card agent-card">
+      <div class="agent-top">
+        <div class="agent-icon">${a.icon}</div>
+        <span class="agent-tag">${a.tag}</span>
+      </div>
+      <div class="player-name">${a.title}</div>
+      <p class="agent-desc">${a.desc}</p>
+      <button class="predict-btn agent-btn" data-agent="${a.id}">${a.action}</button>
+      <div class="predict-result agent-result" id="agent-result-${a.id}"></div>
+    </div>`).join("");
+
+  grid.querySelectorAll(".agent-btn").forEach(btn => {
+    btn.addEventListener("click", () => runAgent(btn.dataset.agent));
+  });
+}
+
+function runAgent(id) {
+  const out = document.getElementById(`agent-result-${id}`);
+  const note = (html) => { out.innerHTML = `<div class="commentary"><span class="ai-tag">Result ·</span> ${html}</div>`; };
+
+  if (id === "predictor") {
+    const upcoming = ZEST_DATA.matches.find(m => m.status !== "completed");
+    if (!upcoming) return note("All matches are completed — check the Points Table for final standings!");
+    const p = AIAgents.predictMatch(upcoming);
+    note(`${p.teamA.name} vs ${p.teamB.name}: <strong>${p.favorite.name}</strong> favoured (${p.probA}% / ${p.probB}%). ${p.reason}`);
+  }
+
+  if (id === "mvp") {
+    const sports = ["Cricket", "Basketball", "Football"];
+    const lines = sports.map(s => {
+      const p = AIAgents.topPerformer(s);
+      return p ? `${s}: <strong>${p.name}</strong> (${teamById(p.team).name})` : "";
+    }).filter(Boolean).join("<br/>");
+    note(lines);
+  }
+
+  if (id === "commentary") {
+    const live = ZEST_DATA.matches.find(m => m.status === "live") || ZEST_DATA.matches[0];
+    note(AIAgents.generateCommentary(live));
+  }
+
+  if (id === "dreamteam") {
+    const dt = AIAgents.dreamTeam("Cricket", 3);
+    note(`Cricket Dream Team: ${dt.map(p => `<strong>${p.name}</strong>`).join(", ")}.`);
+  }
+
+  if (id === "upsets") {
+    const upsets = AIAgents.detectUpsets();
+    if (!upsets.length) return note("No upsets yet — the higher-ranked teams have held serve so far.");
+    note(upsets.map(u => `<strong>${u.winner.name}</strong> upset ${u.loser.name}`).join("<br/>"));
+  }
+
+  if (id === "fatigue") {
+    const lines = ZEST_DATA.teams
+      .map(t => AIAgents.fatigueAdvisor(t.id))
+      .filter(f => f.heavy)
+      .map(f => f.note);
+    note(lines.length ? lines.join("<br/>") : "No team is overloaded yet — workloads look balanced across the fest.");
+  }
+
+  if (id === "momentum") {
+    const lines = ZEST_DATA.teams.slice(0, 4).map(t => {
+      const m = AIAgents.momentum(t.id);
+      return `${m.team.name}: ${m.trend} (${m.results.join("") || "—"})`;
+    });
+    note(lines.join("<br/>"));
+  }
+
+  if (id === "sponsor") {
+    const lines = ZEST_DATA.sponsors.map(s => {
+      const i = AIAgents.sponsorInsights(s);
+      return `${s.name}: <strong>${i.score}/100</strong> exposure score — ${i.note}`;
+    });
+    note(lines.join("<br/><br/>"));
+  }
+
+  if (id === "funfact") {
+    note(AIAgents.funFact());
+  }
+
+  if (id === "chat") {
+    document.getElementById("ai-panel").classList.add("open");
+  }
+}
+
+/* ---------- AI Assistant widget ---------- */
+function initAIAssistant() {
+  const fab = document.getElementById("ai-fab");
+  const panel = document.getElementById("ai-panel");
+  const closeBtn = document.getElementById("ai-close");
+  const form = document.getElementById("ai-form");
+  const input = document.getElementById("ai-input");
+  const messages = document.getElementById("ai-messages");
+
+  const addMsg = (text, who) => {
+    const div = document.createElement("div");
+    div.className = `msg ${who}`;
+    div.textContent = text;
+    messages.appendChild(div);
+    messages.scrollTop = messages.scrollHeight;
+  };
+
+  fab.addEventListener("click", () => panel.classList.toggle("open"));
+  closeBtn.addEventListener("click", () => panel.classList.remove("open"));
+
+  form.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const text = input.value.trim();
+    if (!text) return;
+    addMsg(text, "user");
+    input.value = "";
+    setTimeout(() => addMsg(AIAgents.chatReply(text), "bot"), 300);
+  });
+}
+
+/* ---------- Init ---------- */
+document.addEventListener("DOMContentLoaded", () => {
+  renderHero();
+  initTabs();
+  renderMatches();
+  renderPointsTable();
+  renderPlayers();
+  renderTeams();
+  renderAIInsights();
+  renderGallery();
+  renderSponsors();
+  renderAbout();
+  renderContact();
+  initAIAssistant();
+});
