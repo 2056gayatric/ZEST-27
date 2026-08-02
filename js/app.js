@@ -119,3 +119,86 @@ function renderPointsTable() {
 }
 
 /* ---------- Player Stats / Heroes ---------- */
+function renderPlayers() {
+  const sports = ["Cricket", "Basketball", "Football"];
+  let html = "";
+  sports.forEach(sport => {
+    const top = AIAgents.topPerformer(sport);
+    ZEST_DATA.players.filter(p => p.sport === sport).forEach(p => {
+      const team = teamById(p.team);
+      const isTop = top && p.id === top.id;
+      const statBlocks = sport === "Cricket"
+        ? `<div><span class="v">${p.runs}</span><span class="l">Runs</span></div><div><span class="v">${p.wickets}</span><span class="l">Wickets</span></div>`
+        : sport === "Basketball"
+        ? `<div><span class="v">${p.points}</span><span class="l">Points</span></div><div><span class="v">${p.assists}</span><span class="l">Assists</span></div>`
+        : `<div><span class="v">${p.goals}</span><span class="l">Goals</span></div><div><span class="v">${p.assists}</span><span class="l">Assists</span></div>`;
+
+      html += `
+        <div class="card player-card">
+          <div class="player-top">
+            <div>
+              <div class="player-name">${p.name}</div>
+              <div class="player-role">${team.name} · ${p.role} · ${sport}</div>
+            </div>
+            ${isTop ? `<span class="mvp-flag">🤖 AI Top Performer</span>` : ""}
+          </div>
+          <div class="player-stats">${statBlocks}</div>
+        </div>`;
+    });
+  });
+  document.getElementById("players-grid").innerHTML = html;
+}
+
+/* ---------- Teams ---------- */
+function renderTeams() {
+  document.getElementById("teams-grid").innerHTML = ZEST_DATA.teams.map(t => `
+    <div class="card" style="text-align:center;">
+      <div class="team-swatch" style="background:${t.color}; margin:0 auto 12px; width:52px; height:52px; font-size:1rem;">${t.short}</div>
+      <div class="player-name">${t.name}</div>
+      <div class="player-role">${t.won}W - ${t.lost}L · ${t.points} pts</div>
+    </div>`).join("");
+}
+
+/* ---------- Sponsors ---------- */
+function renderSponsors() {
+  document.getElementById("sponsors-grid").innerHTML = ZEST_DATA.sponsors.map(s => `
+    <div class="card sponsor-card">
+      <div class="player-name">${s.name}</div>
+      <div class="sponsor-tier">${s.tier} Sponsor</div>
+    </div>`).join("");
+}
+
+/* ---------- Gallery ---------- */
+function renderGallery() {
+  document.getElementById("gallery-grid").innerHTML = ZEST_DATA.gallery.map(g => `
+    <div class="card gallery-card">
+      <div class="gallery-thumb">📷</div>
+      <div class="player-name" style="font-size:.9rem;">${g.caption}</div>
+      <div class="player-role">${g.tag}</div>
+    </div>`).join("");
+}
+
+/* ---------- About Us ---------- */
+function renderAbout() {
+  const a = ZEST_DATA.about;
+  document.getElementById("about-organiser-name").textContent = a.organiser;
+  document.getElementById("about-name").textContent = a.tournamentName;
+  document.getElementById("about-dates").textContent = a.dates;
+  document.getElementById("about-locations").textContent = a.locations;
+  document.getElementById("about-ball").textContent = a.ballType;
+  document.getElementById("about-association").textContent = a.association;
+  document.getElementById("about-desc").textContent = a.description;
+}
+
+/* ---------- Contact ---------- */
+function renderContact() {
+  document.getElementById("contact-grid").innerHTML = ZEST_DATA.contact.map(c => `
+    <div class="card contact-card">
+      <div class="player-name">${c.title}</div>
+      <div class="player-role">${c.desc}</div>
+      <div class="contact-line">✉ ${c.email}</div>
+      <div class="contact-line">📞 ${c.phone}</div>
+    </div>`).join("");
+}
+
+/* ---------- AI Insights (10 agents, equally weighted grid) ---------- */
