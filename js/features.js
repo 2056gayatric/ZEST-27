@@ -244,3 +244,79 @@ function initNotifications() {
 }
 
 /* ---------- 8. COUNTDOWN TIMER ---------- */
+function initCountdown() {
+  const el = document.getElementById("countdown");
+  if (!el) return;
+  const target = new Date(ZEST_DATA.countdownTarget).getTime();
+
+  const tick = () => {
+    const diff = target - Date.now();
+    if (diff <= 0) { el.innerHTML = `<div class="countdown-live">🔴 Match is live now!</div>`; return; }
+    const d = Math.floor(diff / 86400000);
+    const h = Math.floor((diff % 86400000) / 3600000);
+    const m = Math.floor((diff % 3600000) / 60000);
+    const s = Math.floor((diff % 60000) / 1000);
+    el.innerHTML = `
+      <div class="countdown-unit"><span>${d}</span><label>Days</label></div>
+      <div class="countdown-unit"><span>${String(h).padStart(2,"0")}</span><label>Hours</label></div>
+      <div class="countdown-unit"><span>${String(m).padStart(2,"0")}</span><label>Mins</label></div>
+      <div class="countdown-unit"><span>${String(s).padStart(2,"0")}</span><label>Secs</label></div>`;
+  };
+  tick();
+  setInterval(tick, 1000);
+}
+
+/* ---------- 9. EVENT TIMELINE (About-adjacent info block) ---------- */
+function renderEventTimeline() {
+  const el = document.getElementById("event-timeline");
+  if (!el) return;
+  el.innerHTML = ZEST_DATA.eventTimeline.map(ev => `
+    <div class="timeline-row">
+      <span class="timeline-t">${ev.time}</span>
+      <span class="timeline-text"><strong>${ev.title}</strong> — ${ev.venue}</span>
+    </div>`).join("");
+}
+
+/* ---------- 10. PLAYER BADGES (extends existing player cards) ---------- */
+function renderBadges() {
+  document.querySelectorAll(".player-card").forEach(card => {
+    const name = card.querySelector(".player-name")?.textContent;
+    const player = ZEST_DATA.players.find(p => p.name === name);
+    if (player && player.badges && player.badges.length && !card.querySelector(".badge-row")) {
+      const row = document.createElement("div");
+      row.className = "badge-row";
+      row.innerHTML = player.badges.map(b => `<span class="badge-chip">${b}</span>`).join("");
+      card.appendChild(row);
+    }
+  });
+}
+
+/* ---------- 11. AI CHAT — quick suggestion chips ---------- */
+function initChatChips() {
+  const row = document.getElementById("ai-chips");
+  if (!row) return;
+  const chips = ["Who is leading?", "Next football match", "Predict today's winner", "Best player so far"];
+  row.innerHTML = chips.map(c => `<button type="button" class="chip">${c}</button>`).join("");
+  row.querySelectorAll(".chip").forEach(btn => {
+    btn.addEventListener("click", () => {
+      document.getElementById("ai-panel").classList.add("open");
+      const form = document.getElementById("ai-form");
+      const input = document.getElementById("ai-input");
+      input.value = btn.textContent;
+      form.dispatchEvent(new Event("submit", { cancelable: true }));
+    });
+  });
+}
+
+/* ---------- Init everything ---------- */
+document.addEventListener("DOMContentLoaded", () => {
+  renderLiveCenter();
+  renderBracket();
+  renderCompare();
+  renderLeaderboard();
+  initNotifications();
+  initCountdown();
+  renderEventTimeline();
+  renderBadges();
+  initChatChips();
+});
