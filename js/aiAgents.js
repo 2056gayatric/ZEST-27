@@ -60,3 +60,38 @@ const AIAgents = {
   /* ---------- 3. AUTO-COMMENTARY AGENT ----------
      Turns a raw match score line into a short, readable
      highlight blurb — handy for a live-updates feed. */
+  generateCommentary(match) {
+    const a = ZEST_DATA.teams.find(t => t.id === match.teamA);
+    const b = ZEST_DATA.teams.find(t => t.id === match.teamB);
+    if (!a || !b) return "";
+
+    if (match.status === "live") {
+      return `🔴 Live: ${a.name} are up against ${b.name} at ${match.venue}. Current score: ${match.scoreA}. Momentum is with the batting side as they push for a big total.`;
+    }
+    if (match.status === "completed") {
+      if (match.result === "draw") {
+        return `${a.name} and ${b.name} shared the spoils in a tightly fought draw, ${match.scoreA} - ${match.scoreB}.`;
+      }
+      const winner = ZEST_DATA.teams.find(t => t.id === match.result);
+      return `${winner ? winner.name : "The visiting side"} closed out a hard-fought contest against ${winner && winner.id === a.id ? b.name : a.name}, final score ${match.scoreA} vs ${match.scoreB}.`;
+    }
+    return `Coming up: ${a.name} face ${b.name} at ${match.venue}, ${match.time}. Expect a closely contested ${match.sport.toLowerCase()} clash.`;
+  },
+
+  /* ---------- 4. DREAM TEAM / BEST XI SELECTOR AGENT ----------
+     Ranks every player in a sport by impact score and returns
+     a short "team of the tournament" list. */
+  dreamTeam(sport, count = 3) {
+    const pool = ZEST_DATA.players.filter(p => p.sport === sport);
+    const impact = (p) => {
+      if (sport === "Cricket") return (p.runs || 0) * 1 + (p.wickets || 0) * 20;
+      if (sport === "Basketball") return (p.points || 0) * 1 + (p.assists || 0) * 2;
+      if (sport === "Football") return (p.goals || 0) * 15 + (p.assists || 0) * 6;
+      return 0;
+    };
+    return [...pool].sort((x, y) => impact(y) - impact(x)).slice(0, count);
+  },
+
+  /* ---------- 5. UPSET / ANOMALY DETECTOR AGENT ----------
+     Flags completed matches where the lower-ranked team on the
+     points table beat the higher-ranked team — the "shocks". */
