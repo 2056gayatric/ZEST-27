@@ -95,3 +95,61 @@ const AIAgents = {
   /* ---------- 5. UPSET / ANOMALY DETECTOR AGENT ----------
      Flags completed matches where the lower-ranked team on the
      points table beat the higher-ranked team — the "shocks". */
+  detectUpsets() {
+    const rankOf = (id) => ZEST_DATA.teams.findIndex(t => t.id === id);
+    const upsets = [];
+    ZEST_DATA.matches.filter(m => m.status === "completed" && m.result !== "draw").forEach(m => {
+      const winner = m.result;
+      const loser = winner === m.teamA ? m.teamB : m.teamA;
+      if (rankOf(winner) > rankOf(loser)) {
+        const w = ZEST_DATA.teams.find(t => t.id === winner);
+        const l = ZEST_DATA.teams.find(t => t.id === loser);
+        upsets.push({ match: m, winner: w, loser: l });
+      }
+    });
+    return upsets;
+  },
+
+  /* ---------- 6. FATIGUE & ROTATION ADVISOR AGENT ----------
+     Counts how many matches a team has played and flags teams
+     that may need a rest / rotation before their next fixture. */
+  fatigueAdvisor(teamId) {
+    const team = ZEST_DATA.teams.find(t => t.id === teamId);
+    if (!team) return null;
+    const recentCount = ZEST_DATA.matches.filter(
+      m => (m.teamA === teamId || m.teamB === teamId) && m.status === "completed"
+    ).length;
+    const heavy = recentCount >= 4;
+    return {
+      team,
+      recentCount,
+      heavy,
+      note: heavy
+        ? `${team.name} have played ${recentCount} matches already — rotating a couple of players could help keep them fresh for the knockouts.`
+        : `${team.name} have a manageable workload (${recentCount} matches) — no rotation concerns yet.`
+    };
+  },
+
+  /* ---------- 7. MOMENTUM / TREND AGENT ----------
+     Looks at each team's last 3 completed results and reports
+     whether they're trending up, down, or steady. */
+  momentum(teamId) {
+    const team = ZEST_DATA.teams.find(t => t.id === teamId);
+    if (!team) return null;
+    const results = ZEST_DATA.matches
+      .filter(m => m.status === "completed" && (m.teamA === teamId || m.teamB === teamId))
+      .sort((a, b) => new Date(b.date) - new Date(a.date))
+      .slice(0, 3)
+      .map(m => (m.result === "draw" ? "D" : m.result === teamId ? "W" : "L"));
+
+    const wins = results.filter(r => r === "W").length;
+    let trend = "steady 🟡";
+    if (wins >= 2) trend = "trending up 📈";
+    if (wins === 0 && results.length) trend = "cooling off 📉";
+
+    return { team, results, trend };
+  },
+
+  /* ---------- 8. SPONSOR VISIBILITY AGENT ----------
+     Gives sponsors a lightweight, explainable "exposure score"
+     based on how much of the fest is left to play. */
