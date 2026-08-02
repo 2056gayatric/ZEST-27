@@ -153,3 +153,62 @@ const AIAgents = {
   /* ---------- 8. SPONSOR VISIBILITY AGENT ----------
      Gives sponsors a lightweight, explainable "exposure score"
      based on how much of the fest is left to play. */
+  sponsorInsights(sponsor) {
+    const played = ZEST_DATA.matches.filter(m => m.status === "completed").length;
+    const total = ZEST_DATA.fest.totalMatches;
+    const remaining = total - played;
+    const tierWeight = sponsor.tier === "Title" ? 1 : sponsor.tier === "Co-Sponsor" ? 0.7 : 0.45;
+    const score = Math.round(tierWeight * (60 + remaining * 1.4));
+    return {
+      sponsor,
+      remaining,
+      score: Math.min(score, 99),
+      note: `${sponsor.name} has ${remaining} matches of on-ground and live-dashboard visibility left as the ${sponsor.tier.toLowerCase()} sponsor.`
+    };
+  },
+
+  /* ---------- 9. FUN FACT / TRIVIA AGENT ----------
+     Generates a rotating, data-grounded fun fact about the fest —
+     handy for filler content on the live dashboard. */
+  funFact() {
+    const facts = [];
+    const topRuns = [...ZEST_DATA.players].filter(p => p.sport === "Cricket").sort((a, b) => (b.runs||0) - (a.runs||0))[0];
+    if (topRuns) facts.push(`${topRuns.name} leads the run charts with ${topRuns.runs} runs so far this fest.`);
+
+    const topWickets = [...ZEST_DATA.players].filter(p => p.sport === "Cricket").sort((a, b) => (b.wickets||0) - (a.wickets||0))[0];
+    if (topWickets) facts.push(`${topWickets.name} has picked up ${topWickets.wickets} wickets — the most of any bowler.`);
+
+    const leader = [...ZEST_DATA.teams].sort((a, b) => b.points - a.points)[0];
+    facts.push(`${leader.name} sit top of the table with ${leader.points} points and a net run rate of ${leader.nrr.toFixed(2)}.`);
+
+    const upsets = this.detectUpsets();
+    if (upsets.length) facts.push(`There have already been ${upsets.length} upset${upsets.length > 1 ? "s" : ""} this fest — biggest shocks so far!`);
+
+    facts.push(`${ZEST_DATA.fest.totalTeams} teams are chasing the ZEST'27 title across ${ZEST_DATA.fest.totalSports} sports.`);
+
+    return facts[Math.floor(Math.random() * facts.length)];
+  },
+
+  /* ---------- 11. MVP PREDICTOR (Live Match Center) ----------
+     Wraps topPerformer() with a rough confidence score for the
+     dedicated live-match view. */
+  predictMVP(sport) {
+    const pool = ZEST_DATA.players.filter(p => p.sport === sport);
+    if (!pool.length) return null;
+    const impact = (p) => {
+      if (sport === "Cricket") return (p.runs || 0) * 1 + (p.wickets || 0) * 20;
+      if (sport === "Basketball") return (p.points || 0) * 1 + (p.assists || 0) * 2;
+      if (sport === "Football") return (p.goals || 0) * 15 + (p.assists || 0) * 6;
+      return 0;
+    };
+    const sorted = [...pool].sort((a, b) => impact(b) - impact(a));
+    const top = sorted[0];
+    const runnerUp = sorted[1];
+    const gap = runnerUp ? impact(top) - impact(runnerUp) : impact(top);
+    const confidence = Math.min(96, Math.round(60 + gap * 0.6));
+    return { player: top, confidence };
+  },
+
+  /* ---------- 10. FEST ASSISTANT AGENT (chat) ----------
+     A small intent-matching chatbot that answers common
+     fest FAQs instantly, no network call needed. */
