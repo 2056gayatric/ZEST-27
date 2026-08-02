@@ -460,3 +460,73 @@ button:focus-visible, .tab-btn:focus-visible, input:focus-visible { outline: 2px
 .countdown-unit label { font-size: 0.65rem; color: var(--text-low); text-transform: uppercase; letter-spacing: 0.05em; }
 .countdown-live { font-family: var(--font-head); color: var(--gold); font-weight: 700; }
 
+/* ---------- Live Match Center ---------- */
+.live-scoreboard { position: relative; }
+.live-sb-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+.live-sb-teams { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.live-sb-team { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 8px; text-align: center; }
+.live-sb-team .team-swatch { width: 48px; height: 48px; border-radius: 12px; font-size: 0.9rem; }
+.live-sb-score { font-family: var(--font-display); font-size: 2.4rem; color: var(--blue-glow); }
+.live-sb-mid { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.live-sb-clock { text-align: center; font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-mid); }
+.live-sb-clock strong { color: var(--gold); font-size: 0.95rem; }
+
+.match-timeline { display: flex; flex-direction: column; gap: 10px; }
+.timeline-row { display: flex; gap: 14px; align-items: baseline; padding-bottom: 10px; border-bottom: 1px dashed var(--border); }
+.timeline-row:last-child { border-bottom: none; padding-bottom: 0; }
+.timeline-t { font-family: var(--font-mono); font-size: 0.72rem; color: var(--gold); min-width: 46px; }
+.timeline-text { color: var(--text-mid); font-size: 0.85rem; }
+
+/* ---------- Tournament Bracket ---------- */
+.bracket { display: flex; gap: 32px; overflow-x: auto; padding-bottom: 8px; }
+.bracket-round { display: flex; flex-direction: column; gap: 24px; min-width: 180px; justify-content: center; }
+.bracket-round-title { font-family: var(--font-mono); font-size: 0.7rem; color: var(--text-low); text-transform: uppercase; letter-spacing: 0.05em; text-align: center; margin-bottom: 4px; }
+.bracket-matches { display: flex; flex-direction: column; gap: 28px; flex: 1; justify-content: space-around; }
+.bracket-match { display: flex; flex-direction: column; gap: 4px; border-left: 2px solid var(--border); padding-left: 10px; }
+.bracket-slot { display: flex; align-items: center; gap: 8px; background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px; font-family: var(--font-mono); font-size: 0.78rem; }
+.bracket-slot.winner { border-color: var(--gold); color: var(--gold); font-weight: 700; }
+.bracket-slot.tbd { color: var(--text-low); font-style: italic; }
+.bracket-swatch { width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0; }
+
+/* ---------- Team Comparison ---------- */
+.compare-picker { display: flex; align-items: center; gap: 16px; justify-content: center; }
+.compare-picker select {
+  background: var(--card); border: 1px solid var(--border); color: var(--text-hi);
+  padding: 10px 14px; border-radius: var(--radius-sm); font-family: var(--font-body); font-size: 0.9rem; min-width: 160px;
+}
+.compare-heads { display: flex; align-items: center; justify-content: space-between; font-family: var(--font-head); font-weight: 700; margin-bottom: 18px; }
+.compare-heads .team-swatch { display: inline-flex; align-items: center; justify-content: center; width: 26px; height: 26px; border-radius: 7px; font-size: 0.6rem; margin: 0 6px; }
+.compare-row { margin-bottom: 16px; }
+.compare-label { font-family: var(--font-mono); font-size: 0.72rem; color: var(--text-low); text-transform: uppercase; margin-bottom: 6px; text-align: center; }
+.compare-bars { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 10px; }
+.compare-bar-track { height: 10px; border-radius: 999px; background: var(--bg-2); overflow: hidden; }
+.compare-bar { height: 100%; }
+.compare-bar.a { background: var(--gold); float: right; }
+.compare-bar.b { background: var(--blue-glow); }
+.compare-vals { display: flex; gap: 10px; font-family: var(--font-mono); font-size: 0.8rem; color: var(--text-hi); }
+
+/* ---------- Leaderboard ---------- */
+.leaderboard-list { display: flex; flex-direction: column; gap: 8px; }
+.leaderboard-row { display: grid; grid-template-columns: 26px 1fr auto auto; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--border); }
+.leaderboard-row:last-child { border-bottom: none; }
+.leaderboard-name { font-weight: 600; font-size: 0.85rem; }
+.leaderboard-val { font-family: var(--font-mono); color: var(--gold); font-weight: 700; }
+
+/* ---------- Statistics charts ---------- */
+.chart-title { font-family: var(--font-head); font-weight: 700; font-size: 0.9rem; margin-bottom: 12px; }
+
+/* ---------- Badges ---------- */
+.badge-row { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+.badge-chip {
+  font-size: 0.68rem; padding: 4px 9px; border-radius: 999px;
+  background: var(--bg-2); border: 1px solid var(--border); color: var(--text-mid);
+  font-family: var(--font-mono);
+}
+
+/* ---------- Chat quick chips ---------- */
+.ai-chips { display: flex; flex-wrap: wrap; gap: 6px; padding: 0 12px 10px; }
+.chip {
+  background: var(--bg-2); border: 1px solid var(--border); color: var(--text-mid);
+  border-radius: 999px; padding: 6px 10px; font-size: 0.7rem;
+}
+.chip:hover { border-color: var(--blue-glow); color: var(--text-hi); }
