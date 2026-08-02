@@ -1,13 +1,13 @@
 # ZEST'27 — Live Fest Dashboard
 
-A single-page, no-build-step dashboard for an intercollegiate sports fest —
-schedule, live scores, points table, player stats, teams, sponsors, gallery,
-about & contact info — plus **10 lightweight AI agents** running entirely in
-the browser.
+A single-page, no-build-step dashboard for **ZEST'27**, the intercollegiate
+sports fest at COEP Technological University, Pune — schedule, live scores,
+points table, player stats, teams, sponsors, gallery, about & contact info —
+plus **10 lightweight AI agents** running entirely in the browser.
 
 No API keys, no backend, no bundler. Open `index.html` or serve the folder
-and it just works. The only external dependency is **Chart.js**, loaded via
-CDN for the Statistics tab — everything else is vanilla HTML/CSS/JS.
+and it just works. The only external script tag is **Chart.js** (loaded via
+CDN) — everything else is vanilla HTML/CSS/JS.
 
 ## Induction task
 
@@ -25,17 +25,19 @@ including 10 small AI agents that run entirely client-side.
 ## Folder structure
 
 ```
-zest27/
-├── index.html            # all markup / sections / tabs
+ZEST'2027/
+├── index.html          # all markup / nav / tabs / panels / AI assistant widget
 ├── css/
-│   └── style.css         # design tokens + all component styles (incl. new features)
+│   └── style.css       # design tokens + all component styles
 ├── js/
-│   ├── data.js            # mock data store (teams, matches, players, sponsors, bracket, stats…)
-│   ├── aiAgents.js         # the 10 AI agents + MVP predictor (pure functions, no network calls)
-│   ├── app.js               # renders the original DOM sections, wires up aiAgents.js
-│   └── features.js           # Live Match Center, Bracket, Compare, Leaderboard, Medals,
-│                              # Stats charts, Notifications, Countdown, badges, chat chips
-├── assets/                 # put logos / real photos here
+│   ├── data.js          # mock data store (ZEST_DATA: teams, matches, players,
+│   │                     # sponsors, gallery, about, contact, bracket, notifications,
+│   │                     # event timeline, countdown target…)
+│   ├── aiAgents.js        # the 10 AI agents (pure functions, no network calls)
+│   ├── app.js               # renders the core sections & wires up aiAgents.js
+│   └── features.js           # Live Match Center, Bracket, Compare, Leaderboard,
+│                              # Notifications, Countdown, badges, chat chips
+├── assets/              # put logos / real photos here
 ├── README.md
 └── .gitignore
 ```
@@ -45,29 +47,31 @@ zest27/
 ### Core dashboard
 | Feature | Where | Notes |
 |---|---|---|
-| 🏠 Live scoreboard | `panel-live` tab | Scores update from `ZEST_DATA.matches` |
-| 📅 Match schedule | `panel-schedule` / hero tabs | Upcoming and past fixtures |
-| 📊 Points table | points table section | Auto-ranks teams by points/NRR |
-| 🏃 Player stats | `panel-stats` tab | Per-player numbers, feeds badges & leaderboards |
+| 📅 Match schedule | `panel-schedule` tab | Upcoming and past fixtures, default landing tab |
+| 📊 Points table | `panel-points` tab | Ranked by points, then NRR |
+| 🏃 Player stats | `panel-players` tab | Per-player numbers + AI-flagged top performer + badges |
 | 🏢 Teams, sponsors, gallery, about & contact | respective tabs | Static content driven by `ZEST_DATA` |
 
 ### Added features (on top of the core dashboard)
 | Feature | Where | Notes |
 |---|---|---|
-| 🔴 Live Match Center | `panel-live` tab | Scoreboard, AI win probability, match timeline, AI MVP prediction |
+| 🔴 Live Match Center | `panel-live` tab | Live scoreboard, AI win probability, match timeline, AI MVP prediction |
 | 🏆 Tournament Bracket | `panel-bracket` tab | Visual single-elimination tree, edit `ZEST_DATA.bracket` |
 | ⚖️ Team Comparison | `panel-compare` tab | Pick any two teams, compares attack/defense/passing/win-rate |
-| 📊 Leaderboards | `panel-leaderboard` tab | Top 5 per sport by primary stat |
-| 🥇 Medal Table | `panel-medals` tab | Gold/silver/bronze counts per team |
-| 📈 Statistics | `panel-stats` tab | 4 Chart.js charts + the event-day timeline |
-| 🔔 Live Notifications | bell icon, top-right of nav | Static feed + simulated toast every ~25s |
+| 📊 Leaderboards | `panel-leaderboard` tab | Top performers per sport |
+| 🤖 AI Insights | `panel-ai` tab | Card grid — run any of the 10 agents on demand |
+| 🔔 Live Notifications | bell icon, top-right of nav | Static feed + simulated toast pushed periodically |
 | ⏱ Countdown | under the hero stats | Counts down to `ZEST_DATA.countdownTarget` |
 | 🏅 Badges | on Player Stats cards | Reads each player's `badges` array in `data.js` |
-| 💬 Chat quick-chips | inside the AI Assistant panel | One-tap common questions |
+| 💬 AI Assistant (floating widget) | `🤖` FAB button, bottom-right | Chat panel with quick-tap question chips |
 
 All of the above are driven entirely by `ZEST_DATA` in `js/data.js` — update
-the arrays there (bracket rounds, medal counts, chart series, notifications,
-countdown target, player badges) and every view re-renders from it.
+the arrays there (bracket rounds, medal counts, notifications, countdown
+target, player badges) and every view re-renders from it.
+
+> **Note:** `index.html` also loads Chart.js via CDN for a future Statistics
+> tab, but no chart is wired up yet — it's a hook left in for whoever wants
+> to add data-viz next.
 
 ### The 10 AI agents (`js/aiAgents.js`)
 | # | Agent | What it does |
@@ -93,28 +97,26 @@ No build tools, no npm install, no API keys — it's a static site.
 
 **Option 1 — just open it**
 ```bash
-open final/index.html      # macOS
-xdg-open final/index.html  # Linux
-start final/index.html     # Windows
+open index.html      # macOS
+xdg-open index.html  # Linux
+start index.html     # Windows
 ```
 
 **Option 2 — serve it locally (recommended)**
 Some browsers restrict `fetch`/module loading on `file://`, so serving the
 folder is safer:
 ```bash
-cd final
 python3 -m http.server 8000
 ```
 Then visit `http://localhost:8000`.
 
 If you have Node instead:
 ```bash
-cd final
 npx serve .
 ```
 
 That's it — no dependencies to install beyond an internet connection for the
-Chart.js CDN script used on the Statistics tab.
+Chart.js CDN script tag in `index.html`.
 
 ## Upgrading an agent to a real LLM
 
