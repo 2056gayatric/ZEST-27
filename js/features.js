@@ -158,3 +158,89 @@ function renderCompare() {
 }
 
 /* ---------- 4. LEADERBOARDS ---------- */
+function renderLeaderboard() {
+  const el = document.getElementById("leaderboard-wrap");
+  const sportsMeta = [
+    { sport: "Cricket", metric: "runs", label: "Runs" },
+    { sport: "Basketball", metric: "points", label: "Points" },
+    { sport: "Football", metric: "goals", label: "Goals" }
+  ];
+
+  el.innerHTML = sportsMeta.map(sm => {
+    const ranked = ZEST_DATA.players
+      .filter(p => p.sport === sm.sport)
+      .sort((x, y) => (y[sm.metric] || 0) - (x[sm.metric] || 0))
+      .slice(0, 5);
+
+    return `
+      <div class="card">
+        <div class="section-head" style="margin:0 0 10px;"><h2 style="font-size:1rem;">${sm.sport} — Top ${sm.label}</h2></div>
+        <div class="leaderboard-list">
+          ${ranked.map((p, i) => `
+            <div class="leaderboard-row">
+              <span class="rank-badge">${i + 1}</span>
+              <span class="leaderboard-name">${p.name}</span>
+              <span class="hint" style="margin:0;">${teamById(p.team).short}</span>
+              <span class="leaderboard-val">${p[sm.metric] || 0}</span>
+            </div>`).join("")}
+        </div>
+      </div>`;
+  }).join("");
+}
+
+/* ---------- 7. LIVE NOTIFICATIONS ---------- */
+function renderNotifications() {
+  const list = document.getElementById("notif-list");
+  const badge = document.getElementById("notif-badge");
+  list.innerHTML = ZEST_DATA.notifications.map(n => `
+    <div class="notif-row">
+      <span class="notif-icon">${n.icon}</span>
+      <div>
+        <div class="notif-title">${n.title}</div>
+        <div class="notif-body">${n.body}</div>
+        <div class="notif-time">${n.minsAgo} min ago</div>
+      </div>
+    </div>`).join("");
+  badge.textContent = ZEST_DATA.notifications.length;
+  badge.style.display = ZEST_DATA.notifications.length ? "flex" : "none";
+}
+
+function pushNotification(icon, title, body) {
+  ZEST_DATA.notifications.unshift({ icon, title, body, minsAgo: 0 });
+  ZEST_DATA.notifications = ZEST_DATA.notifications.slice(0, 8);
+  renderNotifications();
+  showToast(icon, title, body);
+}
+
+function showToast(icon, title, body) {
+  const host = document.getElementById("toast-host");
+  const toast = document.createElement("div");
+  toast.className = "toast";
+  toast.innerHTML = `<span class="notif-icon">${icon}</span><div><div class="notif-title">${title}</div><div class="notif-body">${body}</div></div>`;
+  host.appendChild(toast);
+  setTimeout(() => toast.classList.add("show"), 20);
+  setTimeout(() => { toast.classList.remove("show"); setTimeout(() => toast.remove(), 300); }, 5000);
+}
+
+function initNotifications() {
+  renderNotifications();
+  const bell = document.getElementById("notif-bell");
+  const panel = document.getElementById("notif-panel");
+  bell.addEventListener("click", () => panel.classList.toggle("open"));
+  document.addEventListener("click", (e) => {
+    if (!panel.contains(e.target) && !bell.contains(e.target)) panel.classList.remove("open");
+  });
+
+  // Simulate fresh live events every ~25s using AI commentary as the source.
+  const sample = [
+    { icon: "⚽", title: "Goal!", body: () => `${teamById(ZEST_DATA.teams[Math.floor(Math.random()*6)].id).name} finds the net.` },
+    { icon: "🏀", title: "Momentum shift", body: () => AIAgents.momentum(ZEST_DATA.teams[Math.floor(Math.random()*6)].id).note ? `${AIAgents.momentum(ZEST_DATA.teams[0].id).team.name} is heating up.` : "Momentum shifting on court." },
+    { icon: "🤖", title: "AI insight", body: () => AIAgents.funFact() }
+  ];
+  setInterval(() => {
+    const s = sample[Math.floor(Math.random() * sample.length)];
+    pushNotification(s.icon, s.title, s.body());
+  }, 25000);
+}
+
+/* ---------- 8. COUNTDOWN TIMER ---------- */
