@@ -212,3 +212,70 @@ const AIAgents = {
   /* ---------- 10. FEST ASSISTANT AGENT (chat) ----------
      A small intent-matching chatbot that answers common
      fest FAQs instantly, no network call needed. */
+  chatReply(userText) {
+    const q = userText.toLowerCase();
+    const find = (keywords) => keywords.some(k => q.includes(k));
+
+    if (find(["date", "when", "schedule start"]))
+      return `ZEST'27 runs from ${ZEST_DATA.fest.dates} at ${ZEST_DATA.fest.venue}.`;
+
+    if (find(["venue", "where", "location"]))
+      return `All the action happens at ${ZEST_DATA.fest.venue}.`;
+
+    if (find(["point", "table", "standing", "rank"])) {
+      const leader = [...ZEST_DATA.teams].sort((x, y) => y.points - x.points)[0];
+      return `${leader.name} currently top the points table with ${leader.points} points from ${leader.played} matches.`;
+    }
+
+    if (find(["live", "score", "playing now"])) {
+      const live = ZEST_DATA.matches.find(m => m.status === "live");
+      if (!live) return "No match is live right now — check the Schedule tab for upcoming fixtures.";
+      const a = ZEST_DATA.teams.find(t => t.id === live.teamA);
+      const b = ZEST_DATA.teams.find(t => t.id === live.teamB);
+      return `${a.name} vs ${b.name} is live right now at ${live.venue}. Score: ${live.scoreA}.`;
+    }
+
+    if (find(["team", "how many team"]))
+      return `${ZEST_DATA.fest.totalTeams} teams are competing across ${ZEST_DATA.fest.totalSports} sports this year.`;
+
+    if (find(["win", "predict", "who will win", "chances"])) {
+      const upcoming = ZEST_DATA.matches.find(m => m.status !== "completed");
+      if (!upcoming) return "All matches are completed — check the Points Table for final standings!";
+      const p = this.predictMatch(upcoming);
+      return `For ${p.teamA.name} vs ${p.teamB.name}: ${p.favorite.name} is favoured (${p.probA}% vs ${p.probB}%). ${p.reason}`;
+    }
+
+    if (find(["top scorer", "best player", "player of", "mvp"])) {
+      const c = this.topPerformer("Cricket");
+      return `Top cricket performer so far: ${c.name} (${ZEST_DATA.teams.find(t => t.id === c.team).name}) with ${c.runs} runs and ${c.wickets} wickets.`;
+    }
+
+    if (find(["dream team", "best xi", "best team", "all star"])) {
+      const dt = this.dreamTeam("Cricket", 3).map(p => p.name).join(", ");
+      return `AI Dream Team (Cricket): ${dt}.`;
+    }
+
+    if (find(["upset", "shock"])) {
+      const upsets = this.detectUpsets();
+      if (!upsets.length) return "No upsets yet — the higher-ranked teams have held serve so far.";
+      const u = upsets[0];
+      return `Biggest shock so far: ${u.winner.name} beat ${u.loser.name} despite being lower on the table.`;
+    }
+
+    if (find(["momentum", "form", "trend", "streak"])) {
+      const m = this.momentum("t1");
+      return `${m.team.name} are ${m.trend} — last results: ${m.results.join(", ") || "no data yet"}.`;
+    }
+
+    if (find(["fun fact", "trivia", "fact"]))
+      return this.funFact();
+
+    if (find(["hi", "hello", "hey"]))
+      return "Hey! I'm the ZEST'27 assistant 👋 — ask me about the schedule, live scores, points table, dream team, upsets, or match predictions.";
+
+    if (find(["contact", "organiser", "organizer"]))
+      return "Reach the organising team via the Contact tab, or email support@zest27.coeptech.ac.in.";
+
+    return "I'm not sure about that yet — try asking about the schedule, live score, points table, dream team, upsets, or a match prediction!";
+  }
+};
